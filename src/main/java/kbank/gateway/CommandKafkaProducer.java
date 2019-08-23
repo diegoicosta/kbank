@@ -10,6 +10,8 @@ import org.apache.kafka.common.KafkaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutionException;
+
 public class CommandKafkaProducer {
 
     private KafkaProducer<String, JsonNode> kafkaProducer;
@@ -36,9 +38,9 @@ public class CommandKafkaProducer {
                     (JsonNode) jsonCmd
             );
 
-            kafkaProducer.send(record);
+            kafkaProducer.send(record).get();
             kafkaProducer.commitTransaction();
-        } catch (KafkaException e) {
+        } catch (InterruptedException | ExecutionException | KafkaException e) {
             log.error("Kafka Producer error", e);
             kafkaProducer.abortTransaction();
         }
